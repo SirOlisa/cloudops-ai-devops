@@ -1,0 +1,20 @@
+groups:
+  - name: payment_api_alerts
+    rules:
+      - alert: ServiceDown
+        expr: up{job="payment-api"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Payment API service is down"
+          description: "Prometheus cannot scrape target payment-api:8000 for more than 30 seconds."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status="500"}[1m]) > 0
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP 500 error rate detected"
+          description: "Payment API is returning 500 errors on endpoint {{ $labels.endpoint }}."
